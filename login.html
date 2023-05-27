@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+      button{
+        background-color: black;
+        color: white;
+      }
+    </style>
+</head>
+<body>
+    <nav
+      style="
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        border-bottom: 1px solid;
+      "
+    >
+      <h1>Freelancer</h1>
+      <h3>Admin Side</h3>
+      <a href="./login.html">Login</a>
+      <a href="" id="redirectF">Freelancers</a>
+      <a href="" id="redirectR">Reports</a>
+    </nav>
+    <section>
+      <form style="display: flex;flex-direction: column;width: 50%;margin:20px auto;padding: 20px;border: 1px solid;">
+        <h1 style="text-align: center;">Admin Login Form</h1>
+        <input style="margin: 10px; padding: 10px;" placeholder="Email" type="email" id="email" />
+        <input style="margin: 10px; padding: 10px;" placeholder="Password" type="password" id="pass" />
+        <button id="login_btn" style="margin: 10px; padding: 10px;" type="submit">Login</button>
+      </form>
+    </section>
+  </body>
+</html>
+<script>
+    let url='https://reqres.in/api/login';
+    let form=document.querySelector('form');
+    let Freelancer=document.querySelector('#redirectF')
+    let Reports=document.querySelector('#redirectR')
+
+    Freelancer.addEventListener('click',(e)=>{
+      e.preventDefault()
+      console.log('freelancer')
+
+      let token=localStorage.getItem('token')
+      if(token){
+        window.location.href='freelancers.html'
+      }else{
+        alert('You are not authorised');
+      }
+    })
+
+    Reports.addEventListener('click',(e)=>{
+      e.preventDefault()
+      console.log('report')
+      let token=localStorage.getItem('token')
+      if(token){
+        window.location.href='reports.html'
+      }else{
+        alert('You are not authorised');
+      }
+    })
+
+    form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    form.login_btn.innerText='Loading...'
+
+    fetch(url, {
+      method: "post",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        email: form.email.value,
+        password: form.pass.value
+      }),
+    })
+    .then(res=>{
+        console.log(res)
+        if(res.status!==200){
+          alert(`Error : ${res.status}`)
+        }else{
+
+            return res.json()
+        }
+    })
+    .then((res)=>{
+        form.login_btn.innerText='Login';
+        // console.log(res)
+        if(res.token){
+            localStorage.setItem('token',res.token)
+            window.location.href='freelancers.html'
+        }
+    })
+    .catch(err=>
+        console.log('ok')
+    )
+  });
+</script>

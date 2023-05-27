@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table,th,td{
+            padding: 20px;
+            border: 1px solid;
+            width: fit-content;
+            margin: auto;
+            text-align: center;
+        }
+        table{
+          padding: 0px;
+        }
+        
+    </style>
+</head>
+<body>
+    <nav
+      style="
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        border-bottom: 1px solid;
+      "
+    >
+      <h1>Freelancer</h1>
+      <h3>Admin Side</h3>
+      <a href="./login.html">Login</a>
+      <a href="" id="redirectF">Freelancers</a>
+      <a href="" id="redirectR">Reports</a>
+    </nav>
+    <section>
+        <h1 style="margin: 30px auto;width: fit-content;border-bottom: 1px solid;">Reports</h1>
+      <table>
+        <thead>
+            <tr>
+                <th>Total Freelancers</th>
+                <th>Web Developers</th>
+                <th>Students</th>
+                <th>Graphic Designer</th>
+                <th>Average Rate/Hour</th>
+                <th>Booked</th>
+                <th>Available</th>
+            </tr>
+
+        </thead>
+        <tbody>
+            <tr>
+                <td id="total"></td>
+                <td id="webDev"></td>
+                <td id="student"></td>
+                <td id="desi"></td>
+                <td id="rate"></td>
+                <td id="booked"></td>
+                <td id="avlbl"></td>
+            </tr>
+        </tbody>
+      </table>
+    </section>
+  </body>
+</html>
+<script>
+    let td1=document.querySelector('#total')
+    let td2=document.querySelector('#webDev')
+    let td3=document.querySelector('#student')
+    let td4=document.querySelector('#desi')
+    let td5=document.querySelector('#rate')
+    let td6=document.querySelector('#booked')
+    let td7=document.querySelector('#avlbl')
+    let Freelancer=document.querySelector('#redirectF')
+    let Reports=document.querySelector('#redirectR')
+
+    Freelancer.addEventListener('click',(e)=>{
+      e.preventDefault()
+      console.log('freelancer')
+
+      let token=localStorage.getItem('token')
+      if(token){
+        window.location.href='freelancers.html'
+      }else{
+        alert('You are not authorised');
+      }
+    })
+
+    Reports.addEventListener('click',(e)=>{
+      e.preventDefault()
+      console.log('report')
+      let token=localStorage.getItem('token')
+      if(token){
+        window.location.href='reports.html'
+      }else{
+        alert('You are not authorised');
+      }
+    })
+    
+    fetch('https://masai-hospital-vrp5.onrender.com/users')
+      .then(res=>res.json())
+      .then(res=>{
+        let total=0;
+        res.forEach(el=>total+=el.hourly_rate)
+        
+        td1.innerText=res.length;
+        td2.innerText=res.filter(el=>el.profession==='Web Developer').length
+        td3.innerText=res.filter(el=>el.profession==='Student').length
+        td4.innerText=res.filter(el=>el.profession==='Graphic Designer').length
+        td5.innerText=(total/res.length).toFixed(2)
+        td6.innerText=res.filter(el=>el.isBooked===true).length
+        td7.innerText=res.filter(el=>el.isBooked===false).length
+
+      })
+</script>

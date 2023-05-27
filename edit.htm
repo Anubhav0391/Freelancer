@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      button{
+        background-color: black;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+      style="
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        border-bottom: 1px solid;
+      "
+    >
+      <h1>Freelancer</h1>
+      <h3>Admin Side</h3>
+      <a href="./login.html">Login</a>
+      <a href="./freelancers.html">Freelancers</a>
+      <a href="./reports.html">Reports</a>
+    </nav>
+    <section>
+      <form
+        style="
+          display: flex;
+          flex-direction: column;
+          width: 50%;
+          margin: 20px auto;
+          padding: 20px;
+          border: 1px solid;
+        "
+      >
+        <h1 style="text-align: center">User Edit Form</h1>
+        <input
+          style="margin: 10px; padding: 10px"
+          placeholder="Name"
+          type="text"
+          id="name"
+        />
+        <input
+          style="margin: 10px; padding: 10px"
+          placeholder="Image"
+          type="text"
+          id="image"
+        />
+        <input
+          style="margin: 10px; padding: 10px"
+          placeholder="Email"
+          type="email"
+          id="email"
+        />
+        <input
+          style="margin: 10px; padding: 10px"
+          placeholder="Password"
+          type="password"
+          id="pass"
+        />
+        <select style="margin: 10px; padding: 10px" id="profession">
+          <option value="">Select Profession</option>
+          <option value="Student">Student</option>
+          <option value="Web Developer">Web Developer</option>
+          <option value="Graphic Designer">Graphic Designer</option>
+        </select>
+        <input
+          style="margin: 10px; padding: 10px"
+          placeholder="Skills"
+          type="text"
+          id="skills"
+        />
+        <input
+          style="margin: 10px; padding: 10px"
+          placeholder="Rate per hour"
+          type="number"
+          id="rate"
+        />
+        <button style="margin: 10px; padding: 10px" type="submit">Edit</button>
+      </form>
+    </section>
+  </body>
+</html>
+<script>
+  let url = "https://masai-hospital-vrp5.onrender.com/users";
+  let form = document.querySelector("form");
+  let id = localStorage.getItem("editId");
+
+  fetch(`${url}/${id}`)
+    .then((res) => res.json())
+    .then((res) => {
+      form.name.value = res.name;
+      form.email.value = res.email;
+      form.pass.value = res.password;
+      form.profession.value = res.profession;
+      form.skills.value = res.skills;
+      form.rate.value = res.hourly_rate;
+      form.image.value = res.profile_picture;
+    });
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    fetch(`${url}/${id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        name: form.name.value,
+        email: form.email.value,
+        password: form.pass.value,
+        profession: form.profession.value,
+        skills: form.skills.value.split(","),
+        hourly_rate: +form.rate.value,
+        profile_picture: form.image.value,
+        isBooked: false,
+      }),
+    })
+      .then((res) => console.log(res))
+      .then(() => {
+        alert("Successfully Updated");
+        window.location.href = "freelancers.html";
+      });
+  });
+</script>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      button {
+        background-color: black;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+      style="
+        display: flex;
+        width: 100%;
+        justify-content: space-around;
+        align-items: center;
+        border-bottom: 1px solid;
+      "
+    >
+      <h1>Freelancer</h1>
+      <h3>Admin Side</h3>
+      <a href="./login.html">Login</a>
+      <a href="" id="redirectF">Freelancers</a>
+      <a href="" id="redirectR">Reports</a>
+    </nav>
+    <section>
+      <h1
+        style="
+          text-align: center;
+          border-bottom: 1px solid;
+          width: fit-content;
+          margin: 30px auto;
+        "
+      >
+        Freelancers
+      </h1>
+      <div
+        style="
+          display: flex;
+          width: 100%;
+          justify-content: space-around;
+          align-items: center;
+          margin-bottom: 30px;
+        "
+      >
+        <select style="padding: 5px" id="sort">
+          <option value="">Sort By Hourly Rate</option>
+          <option value="asc">Low to High</option>
+          <option value="desc">High to Low</option>
+        </select>
+        <select style="padding: 5px" name="" id="filter">
+          <option value="">Filter By Profession</option>
+          <option value="Student">Student</option>
+          <option value="Web Developer">Web Developer</option>
+          <option value="Graphic Designer">Graphic Designer</option>
+        </select>
+        <div
+          style="
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+          "
+        >
+          <input style="padding: 5px" type="search" id="search" />
+          <button style="background-color: white; padding: 4px">🔎</button>
+        </div>
+      </div>
+      <div
+        id="cards"
+        style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px"
+      ></div>
+      <div style="display: flex; margin: 30px auto; width: fit-content">
+        <button
+          style="background-color: white; padding: 10px; height: fit-content"
+          id="prev"
+        >
+          <
+        </button>
+        <div
+          id="page"
+          style="background-color: white; padding: 10px; height: fit-content"
+        >
+          1
+        </div>
+        <button
+          style="background-color: white; padding: 10px; height: fit-content"
+          id="next"
+        >
+          >
+        </button>
+      </div>
+    </section>
+  </body>
+</html>
+<script>
+  let page = document.querySelector("#page");
+  let count = 1;
+  let url = `https://masai-hospital-vrp5.onrender.com/users?_page=1&_limit=4`;
+  let cards = document.querySelector("#cards");
+  let sort = document.querySelector("#sort");
+  let filter = document.querySelector("#filter");
+  let prev = document.querySelector("#prev");
+  let next = document.querySelector("#next");
+  let search = document.querySelector("#search");
+  let searchBtn = document.querySelector("#search+button");
+  let Freelancer = document.querySelector("#redirectF");
+  let Reports = document.querySelector("#redirectR");
+
+  Freelancer.addEventListener('click',(e)=>{
+      e.preventDefault()
+      console.log('freelancer')
+
+      let token=localStorage.getItem('token')
+      if(token){
+        window.location.href='freelancers.html'
+      }else{
+        alert('You are not authorised');
+      }
+    })
+
+    Reports.addEventListener('click',(e)=>{
+      e.preventDefault()
+      console.log('report')
+      let token=localStorage.getItem('token')
+      if(token){
+        window.location.href='reports.html'
+      }else{
+        alert('You are not authorised');
+      }
+    })
+
+  searchBtn.addEventListener("click", () => {
+    fetchData(`${url}&name=${search.value}`);
+  });
+
+  sort.addEventListener("change", (e) => {
+    if (e.target.value) {
+      fetchData(`${url}&_sort=hourly_rate&_order=${e.target.value}`);
+    } else {
+      fetchData(url);
+    }
+  });
+
+  filter.addEventListener("change", (e) => {
+    if (e.target.value) {
+      fetchData(`${url}&profession=${e.target.value}`);
+    } else {
+      fetchData(url);
+    }
+  });
+
+  prev.addEventListener("click", () => {
+    count < 2 ? (prev.disabled = true) : (prev.disabled = false);
+    if (count > 1) {
+      count -= 1;
+    }
+    page.innerText = count;
+    fetchData(
+      `https://masai-hospital-vrp5.onrender.com/users?_page=${count}&_limit=4`
+    );
+  });
+
+  next.addEventListener("click", () => {
+    count < 1 ? (prev.disabled = true) : (prev.disabled = false);
+    count++;
+    page.innerText = count;
+    fetchData(
+      `https://masai-hospital-vrp5.onrender.com/users?_page=${count}&_limit=4`
+    );
+    console.log(url);
+  });
+
+  fetchData(url);
+
+  function fetchData(url) {
+    fetch(url)
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+        showCards(res);
+      });
+  }
+
+  function showCards(data) {
+    cards.innerHTML = null;
+
+    data.forEach((el) => {
+      let card = document.createElement("div");
+      card.style.border = "1px solid gainsboro";
+      card.style.textAlign = "center";
+      card.style.padding = "20px";
+      card.style.width = "fit-content";
+      card.style.margin = "auto";
+
+      let img = document.createElement("img");
+      img.src = el.profile_picture;
+
+      let Name = document.createElement("h3");
+      Name.innerText = "Name: " + el.name;
+
+      let email = document.createElement("p");
+      email.innerText = "Email: " + el.email;
+
+      let profession = document.createElement("p");
+      profession.innerText = "Profession: " + el.profession;
+
+      let skills = document.createElement("p");
+      skills.innerText = "Skills: " + el.skills;
+
+      let hourly_rate = document.createElement("p");
+      hourly_rate.innerText = "Hourly Rate: " + el.hourly_rate;
+
+      let status = document.createElement("p");
+      status.innerText = "Booking Status: " + el.isBooked;
+
+      let editBtn = document.createElement("button");
+      editBtn.innerText = "Edit";
+      editBtn.addEventListener("click", () => editUser(el.id));
+
+      let deleteBtn = document.createElement("button");
+      deleteBtn.innerText = "Delete";
+      deleteBtn.addEventListener("click", () => deleteUser(el.id));
+
+      let hireBtn = document.createElement("button");
+      hireBtn.innerText = "Hire Me";
+      if (el.isBooked) {
+        hireBtn.disabled = true;
+      }
+      hireBtn.addEventListener("click", () => hireUser(el.id));
+
+      card.append(
+        img,
+        Name,
+        email,
+        profession,
+        skills,
+        hourly_rate,
+        status,
+        editBtn,
+        deleteBtn,
+        hireBtn
+      );
+      cards.append(card);
+    });
+
+    function editUser(id) {
+      console.log(id);
+      localStorage.setItem("editId", id);
+      window.location.href = "edit.htm";
+    }
+
+    function deleteUser(id) {
+      fetch(`https://masai-hospital-vrp5.onrender.com/users/${id}`, {
+        method: "delete",
+      })
+        .then((res) => console.log(res))
+        .then(() => {
+          fetchData(url);
+          alert("Successfully Deleted");
+        });
+    }
+
+    function hireUser(id) {
+      fetch(`https://masai-hospital-vrp5.onrender.com/users/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify({
+          isBooked: true,
+        }),
+      })
+        .then((res) => console.log(res))
+        .then(() => {
+          fetchData(url);
+          alert("Successfully Hired");
+        });
+    }
+  }
+</script>
